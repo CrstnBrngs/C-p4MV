@@ -1,0 +1,21 @@
+{
+  "name": "C#P4 Modes Visualizer",
+  "short_name": "C#P4 Modes",
+  "description": "A visualizer for guitar modes in C# perfect fourths tuning by Cristian Bringas.",
+  "start_url": "/C-p4MV/app.html",
+  "display": "standalone",
+  "background_color": "#020407",
+  "theme_color": "#00ff78",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192.png?text=Icon",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://via.placeholder.com/512x512.png?text=Icon",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
