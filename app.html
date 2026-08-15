@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>C#P4 Modes Visualizer by Cristian Bringas</title>
+  <title>C#P4 Advanced Scale & Mode Visualizer by Cristian Bringas</title>
   <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.development.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.development.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7.20.15/babel.min.js"></script>
@@ -15,300 +15,641 @@
       margin: 0;
       font-family: 'Orbitron', 'Arial', sans-serif;
       overflow-x: hidden;
-      animation: pulseBackground 10s infinite alternate;
-    }
-    @keyframes pulseBackground {
-      0% { background-position: 20% 20%; }
-      100% { background-position: 80% 80%; }
+      color: #fff;
     }
     .fretboard-container {
       position: relative;
       width: 100%;
-      max-width: 1200px;
+      max-width: 1300px;
       margin: 0 auto;
       padding: 20px;
       perspective: 1200px;
       transform-style: preserve-3d;
     }
     .fretboard {
-      background: linear-gradient(45deg, #1a2a3d, #3d5a7a, #1a2a3d);
-      border-radius: 15px;
-      box-shadow: 0 0 30px rgba(0, 255, 120, 0.3), 0 10px 50px rgba(0, 0, 0, 0.7);
-      transform: rotateX(25deg) translateZ(50px);
-      padding: 15px;
-      border: 2px solid rgba(0, 255, 120, 0.5);
-      animation: hover 4s infinite alternate;
-    }
-    @keyframes hover {
-      0% { transform: rotateX(25deg) translateZ(50px); }
-      100% { transform: rotateX(25deg) translateZ(70px); }
+      background: linear-gradient(135deg, #152238, #2a3b55, #111a28);
+      border-radius: 16px;
+      box-shadow: 0 0 40px rgba(0, 255, 120, 0.25), 0 15px 50px rgba(0, 0, 0, 0.8);
+      transform: rotateX(20deg) translateZ(30px);
+      padding: 20px;
+      border: 2px solid rgba(0, 255, 120, 0.4);
     }
     .fret-numbers {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 5px;
-      font-size: 12px;
+      margin-bottom: 8px;
+      font-size: 11px;
       color: #00ff78;
-      text-shadow: 0 0 5px #00ff78, 0 0 10px #00ff78;
-      transform: rotateX(-25deg) translateZ(10px);
+      text-shadow: 0 0 5px #00ff78;
+      transform: rotateX(-20deg);
+      padding-left: 20px;
+      padding-right: 10px;
+    }
+    .string-row {
+      display: flex;
+      align-items: center;
+      margin: 6px 0;
+    }
+    .string-label {
+      width: 45px;
+      font-weight: bold;
+      color: #00ff78;
+      text-shadow: 0 0 8px rgba(0,255,120,0.6);
+      font-size: 14px;
+      text-align: center;
+      background: rgba(0, 255, 120, 0.1);
+      border: 1px solid rgba(0, 255, 120, 0.3);
+      border-radius: 6px;
+      padding: 4px 0;
+      margin-right: 10px;
     }
     .string {
       display: flex;
-      height: 30px;
-      background: linear-gradient(90deg, rgba(0, 255, 120, 0.1), rgba(255, 0, 150, 0.1));
-      box-shadow: 0 2px 10px rgba(0, 255, 120, 0.3) inset;
-      margin: 3px 0;
-      border-radius: 5px;
+      flex-grow: 1;
+      height: 32px;
+      background: linear-gradient(90deg, rgba(0, 255, 120, 0.15), rgba(255, 0, 150, 0.15));
+      box-shadow: 0 2px 10px rgba(0, 255, 120, 0.2) inset;
+      border-radius: 6px;
       overflow: hidden;
       position: relative;
-      z-index: 1;
-    }
-    .string::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-      animation: shine 3s infinite;
-    }
-    @keyframes shine {
-      0% { left: -100%; }
-      20% { left: 100%; }
-      100% { left: 100%; }
     }
     .fret {
-      width: 48px;
+      flex: 1;
       height: 100%;
-      border-right: 1px solid rgba(0, 255, 120, 0.2);
+      border-right: 2px solid rgba(0, 255, 120, 0.25);
       position: relative;
-      transition: transform 0.3s ease;
-    }
-    .fret::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to top, rgba(0, 255, 120, 0.1), transparent);
-    }
-    .note {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(1);
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      transition: all 0.3s ease;
-      font-size: 10px;
-      color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 1;
-      text-shadow: 0 0 5px #00ff78;
-      box-shadow: 0 0 10px rgba(0, 255, 120, 0.5);
     }
-    .note.active {
-      transform: translate(-50%, -50%) scale(1.5);
-      box-shadow: 0 0 20px rgba(0, 255, 120, 0.8), 0 10px 20px rgba(0, 0, 0, 0.7);
-      z-index: 2;
+    .fret:first-child {
+      border-right: 4px solid rgba(255, 255, 255, 0.6); /* Nut */
     }
-    .note.partial {
-      background: rgba(128, 128, 128, 0.3);
-      box-shadow: none;
-      color: #666;
-      transform: translate(-50%, -50%) scale(1);
-      z-index: 1;
-      text-shadow: none;
+    .note-marker {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      z-index: 10;
+      user-select: none;
     }
-    .mode-label {
+    .note-marker:hover {
+      transform: scale(1.3);
+      z-index: 20;
+    }
+    .glass-card {
+      background: rgba(18, 27, 43, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 255, 120, 0.25);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+    .scale-card {
+      background: rgba(25, 35, 55, 0.85);
+      border-left: 5px solid #00ff78;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
       transition: all 0.3s ease;
-      background: rgba(0, 255, 120, 0.2);
-      border: 1px solid rgba(0, 255, 120, 0.5);
-      backdrop-filter: blur(5px);
     }
-    .mode-label:hover {
-      transform: scale(1.05) rotate(5deg);
-      background: rgba(255, 0, 150, 0.3);
-      color: #00ff78;
-      box-shadow: 0 0 15px rgba(0, 255, 120, 0.5);
+    .scale-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 255, 120, 0.2);
     }
-    input[type="checkbox"]:checked + span {
-      color: #ff00aa;
-      text-shadow: 0 0 10px #ff00aa;
+    input[type="color"] {
+      -webkit-appearance: none;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      background: none;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+    input[type="color"]::-webkit-color-swatch {
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 50%;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #0a0f1a;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #00ff78;
+      border-radius: 4px;
     }
   </style>
 </head>
 <body>
   <div id="root"></div>
   <script type="text/babel">
-    const { useState, useEffect } = React;
+    const { useState, useEffect, useMemo, useRef } = React;
 
-    const fretboard = {
-      strings: ['C#', 'F#', 'B', 'E', 'A', 'D'],
-      frets: 25,
-      modes: {
-        Aeolian: [[0,2,3,5,7,8,10,12,14,15,17,19,20,22,24],[0,2,3,5,7,9,10,12,14,15,17,19,21,22,24],[0,2,4,5,7,9,10,12,14,16,17,19,21,22,24],[0,2,4,5,7,9,11,12,14,16,17,19,21,23,24],[0,2,4,6,7,9,11,12,14,16,18,19,21,23,24],[1,2,4,6,7,9,11,13,14,16,18,19,21,23]],
-        Locrian: [[0,1,3,5,6,8,10,12,13,15,17,18,20,22,24],[0,1,3,5,7,8,10,12,13,15,17,19,20,22,24],[0,2,3,5,7,8,10,12,14,15,17,19,20,22,24],[0,2,3,5,7,9,10,12,14,15,17,19,21,22,24],[0,2,4,5,7,9,10,12,14,16,17,19,21,22,24],[0,2,4,5,7,9,11,12,14,16,17,19,21,23,24]],
-        Ionian: [[0,2,4,5,7,9,11,12,14,16,17,19,21,23,24],[0,2,4,6,7,9,11,12,14,16,18,19,21,23,24],[1,2,4,6,7,9,11,13,14,16,18,19,21,23],[1,2,4,6,8,9,11,13,14,16,18,20,21,23],[1,3,4,6,8,9,11,13,15,16,18,20,21,23],[1,3,4,6,8,10,11,13,15,16,18,20,22,23]],
-        Dorian: [[0,2,3,5,7,9,10,12,14,15,17,19,21,22,24],[0,2,4,5,7,9,10,12,14,16,17,19,21,22,24],[0,2,4,5,7,9,11,12,14,16,17,19,21,23,24],[0,2,4,6,7,9,11,12,14,16,18,19,21,23,24],[1,2,4,6,7,9,11,13,14,16,18,19,21,23],[1,2,4,6,8,9,11,13,14,16,18,20,21,23]],
-        Phrygian: [[0,1,3,5,7,8,10,12,13,15,17,19,20,22,24],[0,2,3,5,7,8,10,12,14,15,17,19,20,22,24],[0,2,3,5,7,9,10,12,14,15,17,19,21,22,24],[0,2,4,5,7,9,10,12,14,16,17,19,21,22,24],[0,2,4,5,7,9,11,12,14,16,17,19,21,23,24],[0,2,4,6,7,9,11,12,14,16,18,19,21,23,24]],
-        Lydian: [[0,2,4,6,7,9,11,12,14,16,18,19,21,23,24],[1,2,4,6,7,9,11,13,14,16,18,19,21,23],[1,2,4,6,8,9,11,13,14,16,18,20,21,23],[1,3,4,6,8,9,11,13,15,16,18,20,21,23],[1,3,4,6,8,10,11,13,15,16,18,20,22,23],[1,3,5,6,8,10,11,13,15,17,18,20,22,23]],
-        Mixolydian: [[0,2,4,5,7,9,10,12,14,16,17,19,21,22,24],[0,2,4,5,7,9,11,12,14,16,17,19,21,23,24],[0,2,4,6,7,9,11,12,14,16,18,19,21,23,24],[1,2,4,6,7,9,11,13,14,16,18,19,21,23],[1,2,4,6,8,9,11,13,14,16,18,20,21,23],[1,3,4,6,8,9,11,13,15,16,18,20,21,23]]
-      }
+    // Chromatic notes
+    const CHROMATIC = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+    // C#P4 Default Tuning
+    const DEFAULT_TUNING = ['C#', 'F#', 'B', 'E', 'A', 'D'];
+
+    // Comprehensive Scale Library with intervals and degree names
+    const SCALE_LIBRARY = {
+      "Modes": [
+        { name: "Ionian (Major)", intervals: [0, 2, 4, 5, 7, 9, 11], degrees: ["I", "II", "III", "IV", "V", "VI", "VII"], desc: "The foundational bright major scale." },
+        { name: "Dorian", intervals: [0, 2, 3, 5, 7, 9, 10], degrees: ["I", "II", "bIII", "IV", "V", "VI", "bVII"], desc: "Minor scale with a raised 6th, jazzy & soulful." },
+        { name: "Phrygian", intervals: [0, 1, 3, 5, 7, 8, 10], degrees: ["I", "bII", "bIII", "IV", "V", "bVI", "bVII"], desc: "Dark Spanish/Middle Eastern flavor with a minor 2nd." },
+        { name: "Lydian", intervals: [0, 2, 4, 6, 7, 9, 11], degrees: ["I", "II", "III", "#IV", "V", "VI", "VII"], desc: "Dreamy and ethereal with a raised 4th." },
+        { name: "Mixolydian", intervals: [0, 2, 4, 5, 7, 9, 10], degrees: ["I", "II", "III", "IV", "V", "VI", "bVII"], desc: "Major scale with a flatted 7th, essential for blues & rock." },
+        { name: "Aeolian (Natural Minor)", intervals: [0, 2, 3, 5, 7, 8, 10], degrees: ["I", "II", "bIII", "IV", "V", "bVI", "bVII"], desc: "Standard natural minor scale." },
+        { name: "Locrian", intervals: [0, 1, 3, 5, 6, 8, 10], degrees: ["I", "bII", "bIII", "IV", "bV", "bVI", "bVII"], desc: "Diminished and tense, built on the 7th degree of major." }
+      ],
+      "Jazz Scales": [
+        { name: "Bebop Dominant", intervals: [0, 2, 4, 5, 7, 9, 10, 11], degrees: ["I", "II", "III", "IV", "V", "VI", "bVII", "VII"], desc: "Mixolydian with an added chromatic passing tone (major 7th)." },
+        { name: "Bebop Major", intervals: [0, 2, 4, 5, 7, 8, 9, 11], degrees: ["I", "II", "III", "IV", "V", "bVI", "VI", "VII"], desc: "Major scale with a flatted 6th passing tone." },
+        { name: "Bebop Dorian", intervals: [0, 2, 3, 4, 5, 7, 9, 10], degrees: ["I", "II", "bIII", "III", "IV", "V", "VI", "bVII"], desc: "Dorian scale with a major 3rd passing tone." },
+        { name: "Altered (Super Locrian)", intervals: [0, 1, 3, 4, 6, 8, 10], degrees: ["I", "bII", "#II", "3", "bV", "bVI", "bVII"], desc: "Extensively altered dominant scale for jazz tension." },
+        { name: "Half-Whole Diminished", intervals: [0, 1, 3, 4, 6, 7, 9, 10], degrees: ["I", "bII", "bIII", "III", "#IV", "V", "VI", "bVII"], desc: "Symmetric octatonic scale used over dominant 7b9 chords." },
+        { name: "Whole Tone", intervals: [0, 2, 4, 6, 8, 10], degrees: ["I", "II", "III", "#IV", "#V", "bVII"], desc: "Symmetrical six-note scale with an ambiguous, dreamy feel." }
+      ],
+      "Pentatonic Scales": [
+        { name: "Major Pentatonic", intervals: [0, 2, 4, 7, 9], degrees: ["I", "II", "III", "V", "VI"], desc: "Extremely versatile 5-note major scale." },
+        { name: "Minor Pentatonic", intervals: [0, 3, 5, 7, 10], degrees: ["I", "bIII", "IV", "V", "bVII"], desc: "The ultimate rock and blues soloing scale." },
+        { name: "Neutral Pentatonic", intervals: [0, 2, 5, 7, 10], degrees: ["I", "II", "IV", "V", "bVII"], desc: "Ambiguous pentatonic without a distinct major/minor 3rd." },
+        { name: "Blues Pentatonic", intervals: [0, 3, 5, 6, 7, 10], degrees: ["I", "bIII", "IV", "bV", "V", "bVII"], desc: "Minor pentatonic plus the flat 5th blue note." }
+      ],
+      "Blues Scales": [
+        { name: "Blues Hexatonic", intervals: [0, 3, 5, 6, 7, 10], degrees: ["I", "bIII", "IV", "bV", "V", "bVII"], desc: "Classic 6-note blues scale with maximum expression." },
+        { name: "Major Blues Scale", intervals: [0, 2, 3, 4, 7, 9], degrees: ["I", "II", "bIII", "III", "V", "VI"], desc: "Joyful blues sound incorporating both minor and major 3rds." }
+      ],
+      "Neapolitan Scales": [
+        { name: "Neapolitan Major", intervals: [0, 1, 3, 5, 7, 9, 11], degrees: ["I", "bII", "bIII", "IV", "V", "VI", "VII"], desc: "Exotic scale with minor 2nd and major 7th." },
+        { name: "Neapolitan Minor", intervals: [0, 1, 3, 5, 7, 8, 11], degrees: ["I", "bII", "bIII", "IV", "V", "bVI", "VII"], desc: "Minor scale with a flatted 2nd and major 7th." }
+      ],
+      "Tritone Scale": [
+        { name: "Tritone Scale", intervals: [0, 1, 6, 7], degrees: ["I", "bII", "#IV", "V"], desc: "Symmetrical scale dividing the octave into tritones." }
+      ],
+      "Melodic Minor & Modes": [
+        { name: "Melodic Minor (Jazz Minor)", intervals: [0, 2, 3, 5, 7, 9, 11], degrees: ["I", "II", "bIII", "IV", "V", "VI", "VII"], desc: "Ascending minor scale with natural 6th and 7th." },
+        { name: "Dorian b2 (Javanese)", intervals: [0, 1, 3, 5, 7, 9, 10], degrees: ["I", "bII", "bIII", "IV", "V", "VI", "bVII"], desc: "Melodic minor 2nd mode with a haunting ethnic texture." },
+        { name: "Lydian Augmented", intervals: [0, 2, 4, 6, 8, 9, 11], degrees: ["I", "II", "III", "#IV", "#V", "VI", "VII"], desc: "Lydian with a sharp 5th degree." },
+        { name: "Lydian Dominant", intervals: [0, 2, 4, 6, 7, 9, 10], degrees: ["I", "II", "III", "#IV", "V", "VI", "bVII"], desc: "Lydian with a flatted 7th, great over 7#11 chords." },
+        { name: "Mixolydian b6 (Hindu)", intervals: [0, 2, 4, 5, 7, 8, 10], degrees: ["I", "II", "III", "IV", "V", "bVI", "bVII"], desc: "Mixolydian with a flatted 6th." },
+        { name: "Locrian #2", intervals: [0, 2, 3, 5, 6, 8, 10], degrees: ["I", "II", "bIII", "IV", "bV", "bVI", "bVII"], desc: "Locrian mode with a natural 2nd." }
+      ],
+      "Harmonic Minor & Modes": [
+        { name: "Harmonic Minor", intervals: [0, 2, 3, 5, 7, 8, 11], degrees: ["I", "II", "bIII", "IV", "V", "bVI", "VII"], desc: "Minor scale with a sharp 7th leading tone." },
+        { name: "Locrian 6", intervals: [0, 1, 3, 5, 6, 9, 10], degrees: ["I", "bII", "bIII", "IV", "bV", "VI", "bVII"], desc: "Second mode of harmonic minor with a natural 6th." },
+        { name: "Ionian #5", intervals: [0, 2, 4, 5, 8, 9, 11], degrees: ["I", "II", "III", "IV", "#V", "VI", "VII"], desc: "Major scale with an augmented 5th." },
+        { name: "Dorian #4 (Ukrainian Dorian)", intervals: [0, 2, 3, 6, 7, 9, 10], degrees: ["I", "II", "bIII", "#IV", "V", "VI", "bVII"], desc: "Dorian with a raised 4th degree." },
+        { name: "Phrygian Dominant (Spanish/Jewish)", intervals: [0, 1, 4, 5, 7, 8, 10], degrees: ["I", "bII", "III", "IV", "V", "bVI", "bVII"], desc: "Exotic flamenco scale with major 3rd and minor 2nd." },
+        { name: "Lydian #2", intervals: [0, 3, 4, 6, 7, 9, 11], degrees: ["I", "#II", "III", "#IV", "V", "VI", "VII"], desc: "Lydian with a sharp 2nd." }
+      ],
+      "Harmonic Major & Modes": [
+        { name: "Harmonic Major", intervals: [0, 2, 4, 5, 7, 8, 11], degrees: ["I", "II", "III", "IV", "V", "bVI", "VII"], desc: "Major scale with a flatted 6th." },
+        { name: "Dorian b5", intervals: [0, 2, 3, 5, 6, 9, 10], degrees: ["I", "II", "bIII", "IV", "bV", "VI", "bVII"], desc: "Dorian mode with a flatted 5th." },
+        { name: "Phrygian b4", intervals: [0, 1, 3, 4, 7, 8, 10], degrees: ["I", "bII", "bIII", "IV", "V", "bVI", "bVII"], desc: "Phrygian mode with a flatted 4th." },
+        { name: "Lydian b3", intervals: [0, 2, 3, 6, 7, 9, 11], degrees: ["I", "II", "bIII", "#IV", "V", "VI", "VII"], desc: "Lydian mode with a flatted 3rd." },
+        { name: "Mixolydian b2", intervals: [0, 1, 4, 5, 7, 9, 10], degrees: ["I", "bII", "III", "IV", "V", "VI", "bVII"], desc: "Mixolydian with a flatted 2nd." },
+        { name: "Lydian Augmented #2", intervals: [0, 3, 4, 6, 8, 9, 11], degrees: ["I", "#II", "III", "#IV", "#V", "VI", "VII"], desc: "Rich and complex harmonic major mode." }
+      ],
+      "Dominant Scales": [
+        { name: "Mixolydian (Dominant 7th)", intervals: [0, 2, 4, 5, 7, 9, 10], degrees: ["I", "II", "III", "IV", "V", "VI", "bVII"], desc: "The primary scale for dominant 7th chords." },
+        { name: "Lydian Dominant", intervals: [0, 2, 4, 6, 7, 9, 10], degrees: ["I", "II", "III", "#IV", "V", "VI", "bVII"], desc: "Bright dominant scale with #11." },
+        { name: "Spanish 8-Tone", intervals: [0, 1, 2, 3, 5, 6, 8, 10], degrees: ["I", "bII", "II", "bIII", "IV", "bV", "bVI", "bVII"], desc: "Octatonic scale rich in Spanish flavor." }
+      ],
+      "Asian Scales": [
+        { name: "In Sen", intervals: [0, 1, 5, 7, 10], degrees: ["I", "bII", "IV", "V", "bVII"], desc: "Traditional Japanese pentatonic scale." },
+        { name: "Hirajoshi", intervals: [0, 2, 3, 7, 8], degrees: ["I", "II", "bIII", "V", "bVI"], desc: "Evocative Japanese pentatonic scale." },
+        { name: "Yo Scale", intervals: [0, 2, 5, 7, 9], degrees: ["I", "II", "IV", "V", "VI"], desc: "Traditional Japanese major pentatonic scale." },
+        { name: "Iwato", intervals: [0, 1, 5, 6, 10], degrees: ["I", "bII", "IV", "#IV", "bVII"], desc: "Dark and modal Japanese folk scale." },
+        { name: "Kumoi", intervals: [0, 2, 3, 7, 9], degrees: ["I", "II", "bIII", "V", "VI"], desc: "Japanese pentatonic mode." },
+        { name: "Chinese Scale", intervals: [0, 4, 6, 7, 11], degrees: ["I", "III", "#IV", "V", "VII"], desc: "Traditional pentatonic structure." },
+        { name: "Pelog", intervals: [0, 1, 3, 7, 8], degrees: ["I", "bII", "bIII", "V", "bVI"], desc: "Indonesian Gamelan heptatonic/pentatonic scale." }
+      ],
+      "Scandinavian Scales": [
+        { name: "Scandinavian Fjord Scale", intervals: [0, 2, 3, 5, 7, 8, 10], degrees: ["I", "II", "bIII", "IV", "V", "bVI", "bVII"], desc: "Nordic folk minor scale." },
+        { name: "Nordic Fiddle Scale", intervals: [0, 2, 4, 6, 7, 9, 10], degrees: ["I", "II", "III", "#IV", "V", "VI", "bVII"], desc: "Lydian-mixolydian blend common in Scandinavian folk." },
+        { name: "Swedish Folk Scale", intervals: [0, 2, 4, 5, 7, 8, 10], degrees: ["I", "II", "III", "IV", "V", "bVI", "bVII"], desc: "Mixolydian b6 variant used in Swedish fiddle tunes." }
+      ]
     };
 
+    // Default color palette for scales
+    const DEFAULT_COLORS = [
+      '#00ff78', '#ff00aa', '#00d2ff', '#ffe600', '#b800ff', '#ff5500', 
+      '#00ffea', '#ff0055', '#70ff00', '#d800ff', '#0088ff', '#ffaa00'
+    ];
+
     const App = () => {
-      const [selectedModes, setSelectedModes] = useState([]);
+      const [rootNote, setRootNote] = useState('C#');
+      const [selectedCategory, setSelectedCategory] = useState('All');
+      const [searchQuery, setSearchQuery] = useState('');
+      const [selectedScales, setSelectedScales] = useState({}); // { scaleFullName: { color, intervals, degrees, name, category } }
+      const [tuning, setTuning] = useState(DEFAULT_TUNING);
+      const [fretsCount, setFretsCount] = useState(24);
 
-      const handleModeToggle = (mode) => {
-        setSelectedModes(prev =>
-          prev.includes(mode) ? prev.filter(m => m !== mode) : [...prev, mode]
-        );
+      // Audio Context for sound playback
+      const audioCtxRef = useRef(null);
+
+      const playTone = (freq) => {
+        try {
+          if (!audioCtxRef.current) {
+            audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+          }
+          const ctx = audioCtxRef.current;
+          if (ctx.state === 'suspended') {
+            ctx.resume();
+          }
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+          gain.gain.setValueAtTime(0.15, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc.start();
+          osc.stop(ctx.currentTime + 0.8);
+        } catch (e) {
+          console.error(e);
+        }
       };
 
-      const getNoteColor = (stringIdx, fretIdx) => {
-        const colors = {
-          Aeolian: [255, 0, 0, 0.7],
-          Locrian: [0, 0, 255, 0.7],
-          Ionian: [255, 255, 0, 0.7],
-          Dorian: [0, 255, 0, 0.7],
-          Phrygian: [128, 0, 128, 0.7],
-          Lydian: [255, 165, 0, 0.7],
-          Mixolydian: [128, 128, 128, 0.7]
+      const noteToFreq = (noteName, octave = 3) => {
+        const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        const semitones = {
+          'C': 0, 'C#': 1, 'Db': 1, 'D': 2, 'D#': 3, 'Eb': 3, 'E': 4,
+          'F': 5, 'F#': 6, 'Gb': 6, 'G': 7, 'G#': 8, 'Ab': 8, 'A': 9,
+          'A#': 10, 'Bb': 10, 'B': 11
         };
+        const baseC0 = 16.35; // C0 freq
+        const semitoneFromC = (octave * 12) + (semitones[noteName] || 0);
+        return baseC0 * Math.pow(2, semitoneFromC / 12);
+      };
 
-        if (selectedModes.length === 0) return { color: 'transparent', class: '' };
-
-        const isInAnyMode = selectedModes.some(mode =>
-          fretboard.modes[mode][stringIdx].includes(fretIdx)
-        );
-
-        if (!isInAnyMode) return { color: 'transparent', class: '' };
-
-        const isCommonToAll = selectedModes.every(mode =>
-          fretboard.modes[mode][stringIdx].includes(fretIdx)
-        );
-
-        if (!isCommonToAll) return { color: 'rgba(128,128,128,0.3)', class: 'partial' };
-
-        let r = 0, g = 0, b = 0, a = 0;
-        selectedModes.forEach(mode => {
-          const [cr, cg, cb, ca] = colors[mode];
-          r += cr;
-          g += cg;
-          b += cb;
-          a += ca;
+      const playScaleArpeggio = (scaleObj) => {
+        const rootIdx = CHROMATIC.indexOf(rootNote);
+        scaleObj.intervals.forEach((interval, idx) => {
+          setTimeout(() => {
+            const noteIdx = (rootIdx + interval) % 12;
+            const noteName = CHROMATIC[noteIdx];
+            playTone(noteToFreq(noteName, idx >= 7 ? 4 : 3));
+          }, idx * 250);
         });
-        r = Math.round(r / selectedModes.length);
-        g = Math.round(g / selectedModes.length);
-        b = Math.round(b / selectedModes.length);
-        a = a / selectedModes.length;
-
-        return { color: `rgba(${r}, ${g}, ${b}, ${a})`, class: 'active' };
       };
 
-      const getNoteLabel = (stringIdx, fretIdx) => {
-        const notes = ['C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C'];
-        const stringNotes = { 'C#': 0, 'F#': 5, 'B': 10, 'E': 3, 'A': 8, 'D': 1 };
-        const baseNote = stringNotes[fretboard.strings[stringIdx]];
-        const noteIndex = (baseNote + fretIdx) % 12;
-        return notes[noteIndex];
-      };
-
-      useEffect(() => {
-        const notes = document.querySelectorAll('.note');
-        notes.forEach(note => {
-          if (note.classList.contains('active')) {
-            gsap.to(note, {
-              y: -5,
-              scale: 1.5,
-              boxShadow: '0 0 20px rgba(0, 255, 120, 0.8), 0 10px 20px rgba(0, 0, 0, 0.7)',
-              duration: 0.3,
-              ease: 'power2.out'
-            });
-          } else if (note.classList.contains('partial')) {
-            gsap.to(note, {
-              y: 0,
-              scale: 1,
-              boxShadow: 'none',
-              duration: 0.3,
-              ease: 'power2.in'
-            });
+      // Toggle scale selection with a default color
+      const handleScaleToggle = (scale, category) => {
+        const key = `${category}:${scale.name}`;
+        setSelectedScales(prev => {
+          const copy = { ...prev };
+          if (copy[key]) {
+            delete copy[key];
           } else {
-            gsap.to(note, {
-              y: 0,
-              scale: 1,
-              boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
-              duration: 0.3,
-              ease: 'power2.in'
-            });
+            // Assign next available color
+            const colorIndex = Object.keys(copy).length % DEFAULT_COLORS.length;
+            copy[key] = {
+              ...scale,
+              category,
+              color: DEFAULT_COLORS[colorIndex]
+            };
+          }
+          return copy;
+        });
+      };
+
+      // Change scale color
+      const handleColorChange = (key, newColor) => {
+        setSelectedScales(prev => ({
+          ...prev,
+          [key]: { ...prev[key], color: newColor }
+        }));
+      };
+
+      // Get note name for a given string and fret
+      const getNoteInfo = (stringNote, fretIdx) => {
+        const baseIdx = CHROMATIC.indexOf(stringNote);
+        const noteIdx = (baseIdx + fretIdx) % 12;
+        const noteName = CHROMATIC[noteIdx];
+        return { noteName, noteIdx };
+      };
+
+      // Determine active scale matches for a note index (0-11)
+      const getNoteMatches = (noteIdx) => {
+        const rootIdx = CHROMATIC.indexOf(rootNote);
+        const matches = [];
+
+        Object.entries(selectedScales).forEach(([key, scale]) => {
+          const scalePitchClasses = scale.intervals.map(interval => (rootIdx + interval) % 12);
+          if (scalePitchClasses.includes(noteIdx)) {
+            matches.push(scale);
           }
         });
-      }, [selectedModes]);
+
+        return matches;
+      };
+
+      // Filtered scales list for sidebar
+      const filteredCategories = useMemo(() => {
+        const result = {};
+        Object.entries(SCALE_LIBRARY).forEach(([category, scales]) => {
+          if (selectedCategory !== 'All' && selectedCategory !== category) return;
+          const matchingScales = scales.filter(scale =>
+            scale.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            scale.desc.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          if (matchingScales.length > 0) {
+            result[category] = matchingScales;
+          }
+        });
+        return result;
+      }, [selectedCategory, searchQuery]);
 
       return (
-        <div className="text-white min-h-screen">
-          <div className="container mx-auto p-6">
-            <h1 className="text-5xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-purple-600">
-              C#P4 Modes Visualizer by Cristian Bringas
+        <div className="min-h-screen pb-16">
+          {/* Header */}
+          <header className="py-8 px-6 text-center border-b border-green-500/20 bg-black/40 backdrop-blur-md">
+            <h1 className="text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-emerald-300 to-purple-500 mb-2">
+              C#P4 Advanced Scale & Mode Visualizer
             </h1>
-            <p className="mb-6 text-center text-green-300">Activate modes to see only the notes they share.</p>
+            <p className="text-green-300/80 text-sm md:text-base font-medium">
+              Created by Cristian Bringas | Professional Fretboard Analysis & Color Fusion Studio
+            </p>
+          </header>
 
-            <div className="mb-6">
-              <h2 className="text-3xl font-semibold text-center mb-4 text-green-400">Select Modes:</h2>
-              <div className="flex flex-wrap justify-center gap-4">
-                {Object.keys(fretboard.modes).map(mode => (
-                  <label key={mode} className="mode-label flex items-center space-x-2 px-5 py-3 rounded-xl cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedModes.includes(mode)}
-                      onChange={() => handleModeToggle(mode)}
-                      className="h-6 w-6 accent-green-400"
-                    />
-                    <span className="text-xl">{mode}</span>
-                  </label>
-                ))}
+          <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+            {/* Left Column: Controls, Root Note, Categories, Scale Picker */}
+            <div className="lg:col-span-1 space-y-6">
+              {/* Root Note Selector */}
+              <div className="glass-card p-5">
+                <label className="block text-sm font-semibold text-green-400 mb-2">Select Root Note:</label>
+                <div className="grid grid-cols-4 gap-2">
+                  {CHROMATIC.map(note => (
+                    <button
+                      key={note}
+                      onClick={() => setRootNote(note)}
+                      className={`py-2 rounded-lg font-bold text-sm transition-all ${
+                        rootNote === note
+                          ? 'bg-green-500 text-black shadow-[0_0_15px_rgba(0,255,120,0.6)]'
+                          : 'bg-gray-800/80 hover:bg-gray-700 text-gray-200'
+                      }`}
+                    >
+                      {note}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tuning & Settings */}
+              <div className="glass-card p-5">
+                <h3 className="text-sm font-semibold text-green-400 mb-2">Tuning (C#P4 Default):</h3>
+                <div className="flex gap-2 justify-between">
+                  {tuning.map((str, idx) => (
+                    <span key={idx} className="string-label !w-8 !text-xs !my-0">{str}</span>
+                  ))}
+                </div>
+                <div className="mt-4 flex items-center justify-between">
+                  <span className="text-xs text-gray-300">Frets:</span>
+                  <select
+                    value={fretsCount}
+                    onChange={(e) => setFretsCount(Number(e.target.value))}
+                    className="bg-gray-800 text-green-400 text-xs px-2 py-1 rounded border border-green-500/40"
+                  >
+                    <option value={12}>12 Frets</option>
+                    <option value={21}>21 Frets</option>
+                    <option value={24}>24 Frets</option>
+                    <option value={25}>25 Frets</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Scale Search & Category Filter */}
+              <div className="glass-card p-5">
+                <h3 className="text-sm font-semibold text-green-400 mb-3">Explore Scale Library:</h3>
+                <input
+                  type="text"
+                  placeholder="Search scale..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-gray-900/90 border border-green-500/30 rounded-lg px-3 py-2 text-sm text-white mb-3 focus:outline-none focus:border-green-400"
+                />
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full bg-gray-900/90 border border-green-500/30 rounded-lg px-3 py-2 text-sm text-white mb-4 focus:outline-none focus:border-green-400"
+                >
+                  <option value="All">All Categories</option>
+                  {Object.keys(SCALE_LIBRARY).map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+
+                {/* Scales Accordion / List */}
+                <div className="space-y-4 max-h-[450px] overflow-y-auto custom-scrollbar pr-1">
+                  {Object.entries(filteredCategories).map(([category, scales]) => (
+                    <div key={category} className="space-y-2">
+                      <h4 className="text-xs font-bold text-purple-400 uppercase tracking-wider">{category}</h4>
+                      <div className="space-y-1.5">
+                        {scales.map(scale => {
+                          const key = `${category}:${scale.name}`;
+                          const isSelected = !!selectedScales[key];
+                          return (
+                            <div
+                              key={scale.name}
+                              onClick={() => handleScaleToggle(scale, category)}
+                              className={`p-2.5 rounded-lg text-xs cursor-pointer transition-all flex items-center justify-between border ${
+                                isSelected
+                                  ? 'bg-green-500/20 border-green-400 text-green-300 font-bold shadow-[0_0_10px_rgba(0,255,120,0.2)]'
+                                  : 'bg-gray-800/40 border-gray-700/50 hover:bg-gray-800 text-gray-300'
+                              }`}
+                            >
+                              <span>{scale.name}</span>
+                              <span className={`w-3 h-3 rounded-full border ${isSelected ? 'bg-green-400 border-white' : 'bg-transparent border-gray-500'}`}></span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            <div className="fretboard-container">
-              <div className="fretboard">
-                <div className="fret-numbers">
-                  {Array.from({ length: 25 }, (_, i) => <span key={i}>{i}</span>)}
+            {/* Right Column: Fretboard Visualizer & Selected Scales Details */}
+            <div className="lg:col-span-3 space-y-6">
+              {/* Fretboard Visualizer Card */}
+              <div className="glass-card p-6 overflow-x-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold text-green-400">
+                    Fretboard Visualizer <span className="text-sm font-normal text-gray-400">(Root: {rootNote})</span>
+                  </h2>
+                  <div className="text-xs text-gray-400">
+                    {Object.keys(selectedScales).length === 0 ? (
+                      <span className="text-yellow-400">⚠️ Select at least one scale to illuminate notes</span>
+                    ) : (
+                      <span className="text-green-400">✨ {Object.keys(selectedScales).length} scale(s) active</span>
+                    )}
+                  </div>
                 </div>
-                {fretboard.strings.map((string, stringIdx) => (
-                  <div key={string} className="string">
-                    {Array.from({ length: 25 }, (_, fretIdx) => {
-                      const { color, class: noteClass } = getNoteColor(stringIdx, fretIdx);
+
+                <div className="min-w-[850px] py-4">
+                  <div className="fretboard">
+                    <div className="fret-numbers">
+                      {Array.from({ length: fretsCount + 1 }, (_, i) => <span key={i}>{i}</span>)}
+                    </div>
+                    {tuning.map((stringNote, stringIdx) => (
+                      <div key={stringIdx} className="string-row">
+                        <div className="string-label">{stringNote}</div>
+                        <div className="string">
+                          {Array.from({ length: fretsCount + 1 }, (_, fretIdx) => {
+                            const { noteName, noteIdx } = getNoteInfo(stringNote, fretIdx);
+                            const matches = getNoteMatches(noteIdx);
+                            let bgStyle = 'transparent';
+                            let boxShadow = 'none';
+                            let zIndex = 1;
+
+                            if (matches.length === 1) {
+                              bgStyle = matches[0].color;
+                              boxShadow = `0 0 12px ${matches[0].color}`;
+                              zIndex = 10;
+                            } else if (matches.length > 1) {
+                              // Multiple scales match: blend colors or use multi-glow
+                              // For simplicity and gorgeous effect, average RGB or show multi-color gradient
+                              const r = Math.round(matches.reduce((acc, m) => acc + parseInt(m.color.slice(1,3), 16), 0) / matches.length);
+                              const g = Math.round(matches.reduce((acc, m) => acc + parseInt(m.color.slice(3,5), 16), 0) / matches.length);
+                              const b = Math.round(matches.reduce((acc, m) => acc + parseInt(m.color.slice(5,7), 16), 0) / matches.length);
+                              bgStyle = `rgb(${r}, ${g}, ${b})`;
+                              boxShadow = `0 0 15px rgb(${r}, ${g}, ${b}), 0 0 5px #fff`;
+                              zIndex = 15;
+                            }
+
+                            const isHighlighted = matches.length > 0;
+
+                            return (
+                              <div key={fretIdx} className="fret" style={{ flex: fretIdx === 0 ? '0 0 35px' : '1' }}>
+                                <div
+                                  className="note-marker"
+                                  onClick={() => playTone(noteToFreq(noteName, stringIdx < 2 ? 3 : 4))}
+                                  style={{
+                                    backgroundColor: isHighlighted ? bgStyle : 'rgba(255,255,255,0.06)',
+                                    color: isHighlighted ? '#000' : '#888',
+                                    fontWeight: isHighlighted ? '900' : 'normal',
+                                    boxShadow: boxShadow,
+                                    opacity: isHighlighted ? 1 : 0.4
+                                  }}
+                                  title={`${noteName} (String ${stringNote}, Fret ${fretIdx})${matches.length ? ' - ' + matches.map(m => m.name).join(', ') : ''}`}
+                                >
+                                  {noteName}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex justify-between items-center mt-4 text-xs text-gray-400 px-2">
+                  <span>💡 Tip: Click any note marker to preview its pitch via Web Audio.</span>
+                  <span className="text-green-400">Tuning: C#P4 (C# F# B E A D)</span>
+                </div>
+              </div>
+
+              {/* Selected Scales Analysis & Degrees Panel (I, II, III, IV, V, VI, VII, VIII...) */}
+              <div className="glass-card p-6">
+                <h3 className="text-xl font-bold text-green-400 mb-4">Selected Scales & Degree Analysis</h3>
+                {Object.keys(selectedScales).length === 0 ? (
+                  <p className="text-gray-400 text-sm py-4 text-center">
+                    No scales selected yet. Choose scales from the left sidebar to inspect their notes, degrees (I, II, III, IV...), and color customization.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(selectedScales).map(([key, scale]) => {
+                      const rootIdx = CHROMATIC.indexOf(rootNote);
+                      const scaleNotes = scale.intervals.map(interval => {
+                        const noteIdx = (rootIdx + interval) % 12;
+                        return CHROMATIC[noteIdx];
+                      });
+
                       return (
-                        <div key={fretIdx} className="fret">
-                          <div
-                            className={`note ${noteClass}`}
-                            style={{ backgroundColor: color }}
-                          >
-                            {getNoteLabel(stringIdx, fretIdx)}
+                        <div key={key} className="scale-card" style={{ borderLeftColor: scale.color }}>
+                          <div className="flex items-center justify-between mb-2">
+                            <div>
+                              <span className="text-xs text-purple-400 font-semibold uppercase">{scale.category}</span>
+                              <h4 className="text-lg font-bold text-white">{rootNote} {scale.name}</h4>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              {/* Color Picker for this scale */}
+                              <div className="flex items-center gap-1">
+                                <input
+                                  type="color"
+                                  value={scale.color}
+                                  onChange={(e) => handleColorChange(key, e.target.value)}
+                                  title="Change scale color"
+                                />
+                              </div>
+                              <button
+                                onClick={() => playScaleArpeggio(scale)}
+                                className="bg-green-500/20 hover:bg-green-500/40 text-green-300 px-3 py-1 rounded-lg text-xs font-semibold border border-green-500/40 transition-all flex items-center gap-1"
+                                title="Play scale arpeggio"
+                              >
+                                ▶ Play
+                              </button>
+                            </div>
+                          </div>
+
+                          <p className="text-xs text-gray-300 mb-3">{scale.desc}</p>
+
+                          {/* Notes & Degrees Table / Badges */}
+                          <div className="bg-black/40 rounded-lg p-3 border border-green-500/20">
+                            <div className="text-xs font-bold text-green-400 mb-2">Scale Degrees (I, II, III, IV...):</div>
+                            <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
+                              {scale.intervals.map((interval, i) => {
+                                const noteIdx = (rootIdx + interval) % 12;
+                                const noteName = CHROMATIC[noteIdx];
+                                const degree = scale.degrees[i] || `deg ${i+1}`;
+                                return (
+                                  <div key={i} className="bg-gray-900/80 rounded p-1.5 text-center border border-gray-700">
+                                    <div className="text-xs font-bold text-green-300">{noteName}</div>
+                                    <div className="text-[10px] text-purple-300 font-mono mt-0.5">{degree}</div>
+                                  </div>
+                                );
+                              })}
+                            </div>
                           </div>
                         </div>
                       );
                     })}
                   </div>
-                ))}
+                )}
               </div>
-              <div className="mt-2 text-right text-sm text-green-400">Tuning C# F# B E A D</div>
-            </div>
-
-            <div className="text-center text-sm mt-6">
-              <span>YouTube: </span>
-              <a href="https://www.youtube.com/@CristianBringas" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">@CristianBringas</a>
-              <span> | Patreon: </span>
-              <a href="https://www.patreon.com/CristianBringas" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">/CristianBringas</a>
             </div>
           </div>
+
+          {/* Footer */}
+          <footer className="text-center text-xs text-gray-400 mt-12 py-6 border-t border-green-500/20">
+            <p>C#P4 Advanced Scale & Mode Visualizer by Cristian Bringas</p>
+            <div className="mt-2 space-x-4">
+              <a href="https://www.youtube.com/@CristianBringas" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">YouTube: @CristianBringas</a>
+              <span>|</span>
+              <a href="https://www.patreon.com/CristianBringas" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">Patreon: /CristianBringas</a>
+            </div>
+          </footer>
         </div>
       );
     };
