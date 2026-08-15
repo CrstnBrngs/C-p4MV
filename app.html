@@ -253,12 +253,14 @@
     ];
 
     const App = () => {
-      const [rootNote, setRootNote] = useState('C#');
+      const [defaultRootNote, setDefaultRootNote] = useState('C#');
       const [selectedCategory, setSelectedCategory] = useState('All');
       const [searchQuery, setSearchQuery] = useState('');
-      const [selectedScales, setSelectedScales] = useState({}); // { scaleFullName: { color, intervals, degrees, name, category } }
-      const [tuning, setTuning] = useState(DEFAULT_TUNING);
+      const [selectedScales, setSelectedScales] = useState({}); // { scaleFullName: { color, rootNote, intervals, degrees, name, category } }
+      const [tuning, setTuning] = useState([...DEFAULT_TUNING]);
       const [fretsCount, setFretsCount] = useState(24);
+
+      const isDefaultTuning = tuning.every((note, index) => note === DEFAULT_TUNING[index]);
 
       // Audio Context for sound playback
       const audioCtxRef = useRef(null);
@@ -303,7 +305,7 @@
       };
 
       const playScaleArpeggio = (scaleObj) => {
-        const rootIdx = CHROMATIC.indexOf(rootNote);
+        const rootIdx = CHROMATIC.indexOf(scaleObj.rootNote || defaultRootNote);
         scaleObj.intervals.forEach((interval, idx) => {
           setTimeout(() => {
             const noteIdx = (rootIdx + interval) % 12;
@@ -326,20 +328,30 @@
             copy[key] = {
               ...scale,
               category,
-              color: DEFAULT_COLORS[colorIndex]
+              color: DEFAULT_COLORS[colorIndex],
+              rootNote: defaultRootNote
             };
           }
           return copy;
         });
       };
 
-      // Change scale color
-      const handleColorChange = (key, newColor) => {
+      // Change one selected scale without affecting the others
+      const handleScalePropertyChange = (key, property, value) => {
         setSelectedScales(prev => ({
           ...prev,
-          [key]: { ...prev[key], color: newColor }
+          [key]: { ...prev[key], [property]: value }
         }));
       };
+
+      // Tune one string without changing the rest of the instrument
+      const handleTuningChange = (stringIndex, note) => {
+        setTuning(prev => prev.map((currentNote, index) =>
+          index === stringIndex ? note : currentNote
+        ));
+      };
+
+      const resetTuning = () => setTuning([...DEFAULT_TUNING]);
 
       // Get note name for a given string and fret
       const getNoteInfo = (stringNote, fretIdx) => {
@@ -351,11 +363,11 @@
 
       // Determine active scale matches for a note index (0-11)
       const getNoteMatches = (noteIdx) => {
-        const rootIdx = CHROMATIC.indexOf(rootNote);
         const matches = [];
 
-        Object.entries(selectedScales).forEach(([key, scale]) => {
-          const scalePitchClasses = scale.intervals.map(interval => (rootIdx + interval) % 12);
+        Object.values(selectedScales).forEach(scale => {
+          const scaleRootIdx = CHROMATIC.indexOf(scale.rootNote || defaultRootNote);
+          const scalePitchClasses = scale.intervals.map(interval => (scaleRootIdx + interval) % 12);
           if (scalePitchClasses.includes(noteIdx)) {
             matches.push(scale);
           }
@@ -395,19 +407,21 @@
           <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Left Column: Controls, Root Note, Categories, Scale Picker */}
             <div className="lg:col-span-1 space-y-6">
-              {/* Root Note Selector */}
+              {/* Default Root Note Selector */}
               <div className="glass-card p-5">
-                <label className="block text-sm font-semibold text-green-400 mb-2">Select Root Note:</label>
+                <label className="block text-sm font-semibold text-green-400 mb-1">Default Root for New Scales:</label>
+                <p className="text-[11px] text-gray-400 mb-3">New selections start here. Every active scale has its own independent root control below.</p>
                 <div className="grid grid-cols-4 gap-2">
                   {CHROMATIC.map(note => (
                     <button
                       key={note}
-                      onClick={() => setRootNote(note)}
+                      onClick={() => setDefaultRootNote(note)}
                       className={`py-2 rounded-lg font-bold text-sm transition-all ${
-                        rootNote === note
+                        defaultRootNote === note
                           ? 'bg-green-500 text-black shadow-[0_0_15px_rgba(0,255,120,0.6)]'
                           : 'bg-gray-800/80 hover:bg-gray-700 text-gray-200'
                       }`}
+                      aria-pressed={defaultRootNote === note}
                     >
                       {note}
                     </button>
@@ -417,13 +431,43 @@
 
               {/* Tuning & Settings */}
               <div className="glass-card p-5">
-                <h3 className="text-sm font-semibold text-green-400 mb-2">Tuning (C#P4 Default):</h3>
-                <div className="flex gap-2 justify-between">
-                  {tuning.map((str, idx) => (
-                    <span key={idx} className="string-label !w-8 !text-xs !my-0">{str}</span>
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div>
+                    <h3 className="text-sm font-semibold text-green-400">Independent String Tuning</h3>
+                    <p className="text-[11px] text-gray-400 mt-1">Change each open string separately.</p>
+                  </div>
+                  <span className={`shrink-0 text-[10px] font-bold px-2 py-1 rounded-full border ${
+                    isDefaultTuning
+                      ? 'text-green-300 border-green-500/40 bg-green-500/10'
+                      : 'text-purple-300 border-purple-500/40 bg-purple-500/10'
+                  }`}>
+                    {isDefaultTuning ? 'C#P4 default' : 'Custom'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {tuning.map((stringNote, stringIndex) => (
+                    <label key={stringIndex} className="block">
+                      <span className="block text-[10px] text-gray-400 mb-1 text-center">String {stringIndex + 1}</span>
+                      <select
+                        value={stringNote}
+                        onChange={(event) => handleTuningChange(stringIndex, event.target.value)}
+                        className="w-full bg-gray-900/90 border border-green-500/30 rounded-lg px-1 py-2 text-sm font-bold text-green-300 text-center focus:outline-none focus:border-green-400"
+                        aria-label={`Tuning for string ${stringIndex + 1}`}
+                      >
+                        {CHROMATIC.map(note => <option key={note} value={note}>{note}</option>)}
+                      </select>
+                    </label>
                   ))}
                 </div>
-                <div className="mt-4 flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={resetTuning}
+                  disabled={isDefaultTuning}
+                  className="w-full mt-3 py-1.5 rounded-lg text-xs font-semibold border border-green-500/30 text-green-300 bg-green-500/10 hover:bg-green-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                >
+                  Reset to C#P4 (C# F# B E A D)
+                </button>
+                <div className="mt-4 pt-4 border-t border-green-500/20 flex items-center justify-between">
                   <span className="text-xs text-gray-300">Frets:</span>
                   <select
                     value={fretsCount}
@@ -479,7 +523,12 @@
                               }`}
                             >
                               <span>{scale.name}</span>
-                              <span className={`w-3 h-3 rounded-full border ${isSelected ? 'bg-green-400 border-white' : 'bg-transparent border-gray-500'}`}></span>
+                              <div className="flex items-center gap-2">
+                                {isSelected && (
+                                  <span className="text-[10px] text-green-300/80 font-mono">{selectedScales[key].rootNote}</span>
+                                )}
+                                <span className={`w-3 h-3 rounded-full border ${isSelected ? 'bg-green-400 border-white' : 'bg-transparent border-gray-500'}`}></span>
+                              </div>
                             </div>
                           );
                         })}
@@ -496,7 +545,7 @@
               <div className="glass-card p-6 overflow-x-auto">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold text-green-400">
-                    Fretboard Visualizer <span className="text-sm font-normal text-gray-400">(Root: {rootNote})</span>
+                    Fretboard Visualizer <span className="text-sm font-normal text-gray-400">(Independent scale roots)</span>
                   </h2>
                   <div className="text-xs text-gray-400">
                     {Object.keys(selectedScales).length === 0 ? (
@@ -552,7 +601,7 @@
                                     boxShadow: boxShadow,
                                     opacity: isHighlighted ? 1 : 0.4
                                   }}
-                                  title={`${noteName} (String ${stringNote}, Fret ${fretIdx})${matches.length ? ' - ' + matches.map(m => m.name).join(', ') : ''}`}
+                                  title={`${noteName} (String ${stringNote}, Fret ${fretIdx})${matches.length ? ' - ' + matches.map(scale => `${scale.rootNote} ${scale.name}`).join(', ') : ''}`}
                                 >
                                   {noteName}
                                 </div>
@@ -566,7 +615,7 @@
                 </div>
                 <div className="flex justify-between items-center mt-4 text-xs text-gray-400 px-2">
                   <span>💡 Tip: Click any note marker to preview its pitch via Web Audio.</span>
-                  <span className="text-green-400">Tuning: C#P4 (C# F# B E A D)</span>
+                  <span className="text-green-400">Tuning: {tuning.join(' ')}{isDefaultTuning ? ' (C#P4 default)' : ' (custom)'}</span>
                 </div>
               </div>
 
@@ -580,32 +629,42 @@
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Object.entries(selectedScales).map(([key, scale]) => {
-                      const rootIdx = CHROMATIC.indexOf(rootNote);
-                      const scaleNotes = scale.intervals.map(interval => {
-                        const noteIdx = (rootIdx + interval) % 12;
-                        return CHROMATIC[noteIdx];
-                      });
+                      const rootIdx = CHROMATIC.indexOf(scale.rootNote || defaultRootNote);
 
                       return (
                         <div key={key} className="scale-card" style={{ borderLeftColor: scale.color }}>
-                          <div className="flex items-center justify-between mb-2">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
                             <div>
                               <span className="text-xs text-purple-400 font-semibold uppercase">{scale.category}</span>
-                              <h4 className="text-lg font-bold text-white">{rootNote} {scale.name}</h4>
+                              <h4 className="text-lg font-bold text-white">{scale.rootNote} {scale.name}</h4>
                             </div>
-                            <div className="flex items-center gap-3">
+                            <div className="flex flex-wrap items-end gap-3">
+                              {/* Independent root picker for this scale */}
+                              <label className="block">
+                                <span className="block text-[10px] text-gray-400 mb-1">Root</span>
+                                <select
+                                  value={scale.rootNote}
+                                  onChange={(event) => handleScalePropertyChange(key, 'rootNote', event.target.value)}
+                                  className="bg-gray-900 border border-purple-500/40 rounded-lg px-2 py-1.5 text-sm font-bold text-purple-300 focus:outline-none focus:border-purple-300"
+                                  aria-label={`Root note for ${scale.name}`}
+                                >
+                                  {CHROMATIC.map(note => <option key={note} value={note}>{note}</option>)}
+                                </select>
+                              </label>
                               {/* Color Picker for this scale */}
-                              <div className="flex items-center gap-1">
+                              <label className="block">
+                                <span className="block text-[10px] text-gray-400 mb-1">Color</span>
                                 <input
                                   type="color"
                                   value={scale.color}
-                                  onChange={(e) => handleColorChange(key, e.target.value)}
-                                  title="Change scale color"
+                                  onChange={(event) => handleScalePropertyChange(key, 'color', event.target.value)}
+                                  title={`Change color for ${scale.rootNote} ${scale.name}`}
+                                  aria-label={`Color for ${scale.rootNote} ${scale.name}`}
                                 />
-                              </div>
+                              </label>
                               <button
                                 onClick={() => playScaleArpeggio(scale)}
-                                className="bg-green-500/20 hover:bg-green-500/40 text-green-300 px-3 py-1 rounded-lg text-xs font-semibold border border-green-500/40 transition-all flex items-center gap-1"
+                                className="bg-green-500/20 hover:bg-green-500/40 text-green-300 px-3 py-1.5 rounded-lg text-xs font-semibold border border-green-500/40 transition-all flex items-center gap-1"
                                 title="Play scale arpeggio"
                               >
                                 ▶ Play

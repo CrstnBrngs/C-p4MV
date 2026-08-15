@@ -4,6 +4,8 @@ A Progressive Web App (PWA) to visualize guitar modes in C# perfect fourths tuni
 
 ## Features
 - Visualize notes for modes (Aeolian, Locrian, Ionian, Dorian, Phrygian, Lydian, Mixolydian).
+- Give every selected scale its own root note, color, degree analysis, and audio preview.
+- Tune all six strings independently, with C#P4 (`C# F# B E A D`) kept as the default and available through a one-click reset.
 - Highlight shared notes between selected modes with distinct colors.
 - Futuristic alien-inspired design with neon effects.
 - Offline support via service worker.
