@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cp4mv-cache-v1';
+const CACHE_NAME = 'cp4mv-cache-v2';
 const urlsToCache = [
   '/C-p4MV/',
   '/C-p4MV/app.html',
